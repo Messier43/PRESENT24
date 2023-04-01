@@ -66,7 +66,7 @@ def cadencement(maitre):
 
 
 
-###TESTS###
+###NON UTILISE###
 def permutation3(entree):
 	sortie = 0
 	bit_sortie=0
@@ -84,13 +84,7 @@ def generation_sbox_large():
 	return sortie
 
 sbox_large = generation_sbox_large()
-###########
-
-
-
-###### CADENCEMENT ######
-#extraire sous cĺé ki <=> garder les bits 39 , 38 .. 17, 16 du registre K au tour i
-
+################
 
 
 ########## TEST #########
