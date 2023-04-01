@@ -66,7 +66,7 @@ def cadencement(maitre):
 
 
 
-###NON UTILISE###
+###NON UTILISÉ###
 def permutation3(entree):
 	sortie = 0
 	bit_sortie=0
@@ -87,6 +87,8 @@ sbox_large = generation_sbox_large()
 ################
 
 
+
+
 ########## TEST #########
 def tests_chiffrement(num_test):
 	match num_test:
@@ -102,6 +104,10 @@ def tests_chiffrement(num_test):
 		case 4:
 			print(hex(chiffrement(0xf955b9,0xd1bd2d)))
 #tests_chiffrement(int(argv[1]))
+
+
+
+########## CLI #########
 
 if (len(argv)>3) and (argv[1] == "chiffrement"):
 	message = int(argv[2], 16)
