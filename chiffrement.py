@@ -4,10 +4,6 @@ from sys import argv
 #sbox[i] => nouvelle valeur du mot i
 sbox = [0xc,5,6,0xb,9,0,0xa,0xd,0x3,0xe,0xf,8,4,7,1,2]
 
-#liste de permutation du chiffrement du PRESENT24
-#liste[i] => nouvelle position du bit i
-liste_permutation = [0,6,12,18,1,7,13,19,2,8,14,20,3,9,15,21,4,10,16,22,5,11,17,23]
-
 
 #message : message (entier) à chiffrer de taille 24 bits
 #cle : clé (entier)
@@ -16,21 +12,27 @@ def chiffrement(message, cle):
 	k = cadencement(cle)
 	etat = message
 	for i in range(1,11):
-		etat = permutation(substitution(etat^k[i-1], sbox), liste_permutation)
+		etat = permutation(substitution(etat^k[i-1], sbox))
 	return etat ^ k[10]
 
 
-#entree : suite de bits (entier) de 24 bits à permuter
-#permutations : liste de permutation
+#value : suite de bits (entier) de 24 bits à permuter
 #Renvoie l'entier dont les bits ont été permutés
-def permutation(entree, permutations):
-	sortie = 0
-	mask = 1 << 23
-	for i in range(24):
-		#Pour chaque bit entrée à 1, on ajoute 1 à la position indiquée dans la liste
-		sortie += (mask & entree) and (1 << 23-permutations[i])
-		mask >>= 1
-	return sortie
+def permutation(value):
+	value = permutation_step(value, 0x00001100, 16)
+	value = permutation_step(value, 0x000c080c, 4)
+	value = permutation_step(value, 0x00220022, 2)
+	value = permutation_step(value, 0x10144114, 1)
+	value = permutation_step(value, 0x21121212, 2)
+	value = permutation_step(value, 0x08090606, 4)
+	value = permutation_step(value, 0x000c0030, 8)
+	value = permutation_step(value, 0x00000c3c, 16)
+	return value
+
+
+def permutation_step(value, mask, shift):
+	result = ((value >> shift) ^ value) & mask
+	return (value ^ result) ^ (result << shift)
 
 
 #entree : suite de 24 bits (entier) à substituer
@@ -67,6 +69,11 @@ def cadencement(maitre):
 
 
 ###NON UTILISÉ###
+'''
+#liste de permutation du chiffrement du PRESENT24
+#liste[i] => nouvelle position du bit i
+liste_permutation = [0,6,12,18,1,7,13,19,2,8,14,20,3,9,15,21,4,10,16,22,5,11,17,23]
+
 def permutation3(entree):
 	sortie = 0
 	bit_sortie=0
@@ -84,6 +91,16 @@ def generation_sbox_large():
 	return sortie
 
 sbox_large = generation_sbox_large()
+
+def permutation_old(entree, permutations):
+	sortie = 0
+	mask = 1 << 23
+	for i in range(24):
+		#Pour chaque bit entrée à 1, on ajoute 1 à la position indiquée dans la liste
+		sortie += (mask & entree) and (1 << 23-permutations[i])
+		mask >>= 1
+	return sortie
+'''
 ################
 
 
@@ -95,7 +112,7 @@ def tests_chiffrement(num_test):
 		case 0: #Substitution
 			print(hex(substitution(0x30000f,sbox)))
 		case 1: #Permutation
-			print(bin(permutation(0x888888,liste_permutation)))
+			print(bin(permutation(0x888888)))
 		case 2: #Rotation Gauche
 			print(bin(rotation_gauche(0b111010000,3,9)))
 		case 3:
