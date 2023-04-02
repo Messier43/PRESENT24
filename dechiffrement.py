@@ -26,11 +26,10 @@ def inverse_permutation(value):
 #message : message (entier) à déchiffrer de taille 24 bits
 #cle : clé (entier)
 #Renvoie le clair (entier)
-def dechiffrement(chiffre, cle):
+def dechiffrement(etat, cle):
 	k = cadencement(cle)
-	etat = chiffre ^ k[10]
 	for i in range(9,-1,-1):
-		etat = substitution(inverse_permutation(etat),sbox_inverse)^k[i]
+		etat = substitution(inverse_permutation(etat^k[i]),sbox_inverse)
 	return etat
 
 
