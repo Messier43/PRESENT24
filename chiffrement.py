@@ -11,8 +11,8 @@ sbox = [0xc,5,6,0xb,9,0,0xa,0xd,0x3,0xe,0xf,8,4,7,1,2]
 def chiffrement(message, cle):
 	k = cadencement(cle)
 	etat = message
-	for i in range(1,11):
-		etat = permutation(substitution(etat^k[i-1], sbox))
+	for i in range(0,10):
+		etat = permutation(substitution(etat^k[i], sbox))
 	return etat ^ k[10]
 
 
@@ -40,9 +40,9 @@ def permutation_step(value, mask, shift):
 def substitution(entree, liste_substitution):
 	sortie = 0
 	mask = 0xf
-	for i in range(6):
+	for i in [0, 4, 8, 12, 16, 20]:
 		#les 4 derniers bits sont passés à sbox puis sont insérés à la sortie
-		sortie += liste_substitution[entree & mask] << 4*i
+		sortie += liste_substitution[entree & mask] << i
 		entree = entree >> 4
 	return sortie
 

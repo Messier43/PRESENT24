@@ -29,8 +29,8 @@ def inverse_permutation(value):
 def dechiffrement(chiffre, cle):
 	k = cadencement(cle)
 	etat = chiffre ^ k[10]
-	for i in range(10,0,-1):
-		etat = substitution(inverse_permutation(etat),sbox_inverse)^k[i-1]
+	for i in range(9,0,-2):
+		etat = substitution(inverse_permutation(etat),sbox_inverse)^k[i]
 	return etat
 
 
