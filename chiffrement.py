@@ -8,12 +8,11 @@ sbox = [0xc,5,6,0xb,9,0,0xa,0xd,0x3,0xe,0xf,8,4,7,1,2]
 #message : message (entier) à chiffrer de taille 24 bits
 #cle : clé (entier)
 #Renvoie le chiffré (entier)
-def chiffrement(message, cle):
+def chiffrement(etat, cle):
 	k = cadencement(cle)
-	etat = message
-	for i in range(0,10):
-		etat = permutation(substitution(etat^k[i], sbox))
-	return etat ^ k[10]
+	for i in k:
+		etat = permutation(substitution(etat, sbox))^i
+	return etat
 
 
 #value : suite de bits (entier) de 24 bits à permuter
@@ -54,15 +53,15 @@ def rotation_gauche(nombre, decalage, taille):
 
 
 #Renvoie une liste contenant les 11 sous-cĺés à partir de la clé 'maitre'
-def cadencement(maitre):
+def cadencement(K):
 	resultat = []
-	K = maitre << 56
+	K <<= 56
 	for i in range(1,11):
-		resultat.append(K>>16 & 0xffffff)
-		K = rotation_gauche(K,61,80)
-		K = (sbox[K >>76] << 76) | (~(0xf<<76) & K)
+		K = (K << 61) & 0xffffffffffffffffffff | K >> 19
+		K = (sbox[K >>76] << 76) + ( K & 0xfffffffffffffffffff)
 		K ^= i << 15
-	resultat.append(K>>16 & 0xffffff) #derniere sous clé
+		resultat.append(K>>16 & 0xffffff)
+	#resultat.append(K>>16 & 0xffffff) #derniere sous clé
 	return resultat
 
 
