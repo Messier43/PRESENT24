@@ -2,7 +2,8 @@
 
 ## USAGE
 
-Pour chiffrer/déchiffrer un message de 24 bits, il faut exécuter le fichier chiffrement.py/dechiffrement.py avec comme arguments le message/chiffré, la première clé et éventuellement la seconde clé pour le chiffrement 2PRESENT24. Les messages, chiffrés et clés sont en format hexadécimal
+Pour chiffrer/déchiffrer un message de 24 bits, il faut exécuter le fichier chiffrement.py/dechiffrement.py avec comme arguments le message/chiffré, la première clé et éventuellement la seconde clé pour le chiffrement 2PRESENT24. Les messages, chiffrés et clés sont en format hexadécimal.
+
 Pour lancer l'attaque, il suffit d'entrer les deux couples clair/chiffré à la suite
 
 ### CLI
