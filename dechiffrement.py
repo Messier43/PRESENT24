@@ -9,7 +9,6 @@ def liste_inversion(liste):
 	return inversee
 
 #Version des listes utilisées pour le déchiffrement
-#liste_permutation_inverse = liste_inversion(liste_permutation)
 sbox_inverse = liste_inversion(sbox)
 
 def inverse_permutation(value):
@@ -23,31 +22,18 @@ def inverse_permutation(value):
     value = permutation_step(value, 0x505050, 1)
     return value
 
-#message : message (entier) à déchiffrer de taille 24 bits
-#cle : clé (entier)
-#Renvoie le clair (entier)
 def dechiffrement(etat, cle):
+	"""
+	message : message (entier) à déchiffrer de taille 24 bits
+	cle : clé (entier)
+	Renvoie le clair (entier)
+	les étapes du chiffrement sont effectuées dans l'ordre inverse
+	"""
 	k = cadencement(cle)
 	for i in range(9,-1,-1):
 		etat = substitution(inverse_permutation(etat^k[i]),sbox_inverse)
 	return etat
 
-
-
-
-########## TEST #########
-def tests_dechiffrement(num_test):
-	match num_test:
-		case 0:
-			print(hex(dechiffrement(chiffrement(0xf955b9,0xd1bd2d),0xd1bd2d)))
-		case 1: #Permutations
-			print(hex(permutation(0x800002, liste_permutation)))
-			print(hex(permutation(permutation(0x800002,liste_permutation), liste_permutation_inverse)))
-		case 2: #substitutions
-			print(hex(substitution(0x800002, sbox)))
-			print(hex(substitution(substitution(0x800002, sbox), sbox_inverse)))
-
-#tests_dechiffrement(int(argv[1]))
 
 ########## CLI #########
 if (len(argv)>3) and (argv[1] == "dechiffrement"):
