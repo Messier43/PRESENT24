@@ -2,98 +2,45 @@ from sys import argv
 from chiffrement import *
 from dechiffrement import *
 import time
-import pickle
-
-#Génère les listes Lm et Lc à partir d'un couple clair chiffré
-#Les listes ont pour indice le message ou le chiffré
-#Les listes ont pour valeur une liste de clés qui génère ce message ou chiffré
-def generation_listes(clair,chiffre):
-	start = time.time()
-	lm, lc = [[] for x in range(1<<24)],[[] for x in range(1<<24)]
-	print("Listes Lm et Lc allouées en "+"%.2f" % (time.time()-start)+"s, génération des listes ...")
-	start = time.time()
-	for cle in range(1<<24):
-		lm[chiffrement(clair,cle)].append(cle)
-	print("Liste Lm générée")
-	for cle in range(1<<24):
-		lc[dechiffrement(chiffre,cle)].append(cle)
-	print("Listes générées en "+"%.2f" % (time.time()-start)+"s")
-	return [lm,lc]
 
 
-def trouver_collision(lmlc):
+
+def attaque(couple1,couple2):
+	"""
+	Affiche les couples de clés potentiels en prenant en paramètre 2 couples clair-chiffré (int)
+	Le calcul est fait en plusieurs étapes :
+	- Pour les clés k1 de 0 à 2^24-1 on stocke la clé k1 dans la liste lm à l'indice lm[chiffré produit par k1 et clair1]
+		On a donc la relation lm[PRESENT24(k1)(clair1)] = k1
+	-Ensuite pour chaque clé k2 de 0 à 2^24-1, on calcule clair = PRESENT24-1(k2)(chiffre1)
+		si ce clair correspond à un chiffré dans la liste lm, c'est à dire si lm[chiffré] =/= vide
+		on sait que ce couple de clés produisent le même message avec clair1 et chiffre1, donc on le stocke dans collisions
+	-Enfin on calcule 2PRESENT24 avec k1 et k2 sur le clair2 et on teste si on retrouve bien chiffre2
+	"""
+
 	collisions = []
-	for i in range(1<<24):
-		if (lmlc[0][i] !=[]) and (lmlc[1][i] != []) :
-			collisions.append((lmlc[0][i],lmlc[1][i]))
-	return collisions
-
-
-def tests_cle(clair2, chiffre2, collisions):
-	print("Tests des clés sur le second couple")
-	start = time.time()
-	resultats = []
+	#lm : dict de listes vides, la liste a pour indice tous les messages possibles
+	lm = {k: [] for k in range(1<<24)}
+	for cle in range(1<<24):
+		#chaque clé est ajoutée au tableau à l'indice correspondant au message qu'elle produit
+		lm[chiffrement(couple1[0],cle)].append(cle)
+	for cle in range(1<<24):
+		c = dechiffrement(couple1[1],cle)
+		if lm[c] != []: #si ce clair est aussi un chiffré produit par une des clés k1
+			for k1 in lm[c]: #pour chaque clé produisant ce chiffré
+				collisions.append((k1,cle)) #on stocke ce couple
+	print("Nombre de collisions : " + str(len(collisions)))
 	for couple in collisions:
-		for k1 in couple[0]:
-			for k2 in couple[1]:
-					if chiffrement(chiffrement(clair2,k1),k2) == chiffre2:
-						resultats.append([k1,k2])
-						#print(str(hex(k1))+" "+str(hex(k2)))
-	print("Tests effectués en "+"%.2f" % (time.time()-start)+"s")
-	return resultats
+		#on teste pour chaque clé qui produisent des sorties identiques
+		if chiffrement(chiffrement(couple2[0],couple[0]),couple[1]) == couple2[1]:
+			print(str(hex(couple[0])) + " " + str(hex(couple[1])))
 
-def attaque(couple1, couple2):
-	collisions = trouver_collision(generation_listes(couple1[0],couple1[1]))
-	return tests_cle(couple2[0], couple2[1], collisions)
 
 
 ########## CLI #########
 if (len(argv)>5) and (argv[1] == "attaque"):
 	couple1 = [int(argv[2], 16), int(argv[3], 16)]
 	couple2 = [int(argv[4], 16), int(argv[5], 16)]
-	cles = attaque(couple1, couple2)
-	for couple in cles:
-		print(str(hex(couple[0]))+" "+str(hex(couple[1])))
-
-
-
-
-'''
-
-########## TEST #########
-fListes = open("listes","xb")
-
-listes = generation_listes(0x2dc245,0x3d9a4e)
-
-####Sérialisation####
-pickle.dump(listes,fListes)
-fListes.close()
-
-
-
-#####TEST#####
-fListes = open("listes","br")
-listes = pickle.load(fListes)
-
-maxlen=0
-for i in range(1<<24):
-	if len(listes[1][i]) > maxlen:
-		maxlen = len(listes[1][i])
-print(maxlen)
-
-
-fCollisions = open("collisions2","xb")
-pickle.dump(trouver_collision(listes[0],listes[1]),fCollisions)
-fCollisions.close()
-
-
-fCollisions = open("collisions2", "br")
-collisions = pickle.load(fCollisions)
-tests_cle(0x994a22,0xd75194,collisions)
-
-'''
-
-
+	attaque(couple1, couple2)
 
 
 
