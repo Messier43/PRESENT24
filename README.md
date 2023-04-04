@@ -11,9 +11,10 @@ Pour lancer l'attaque, il suffit d'entrer les deux couples clair/chiffré à la 
     python chiffrement.py chiffrement <message> <clé 1> [<clé 2>]
     python dechiffrement.py dechiffrement <chiffré> <clé 1> [<clé 2>]
     python attaque.py attaque <clair 1> <chiffré 1> <clair 2> <chiffré 2>
-    python attaque_mp.py attaque <clair 1> <chiffré 1> <clair 2> <chiffré 2>
     
-Exemple :
+Exemples :
 
     $ python chiffrement.py chiffrement f955b9 d1bd2d
     47a929
+    $ python dechiffrement.py dechiffrement 3d9a4e 6e92b4 72af47
+    2dc245
